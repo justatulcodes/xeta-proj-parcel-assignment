@@ -1,0 +1,57 @@
+<resources>
+    <string name="app_name">MWS Care</string>
+
+    <!-- Home Screen -->
+    <string name="welcome">Welcome !</string>
+    <string name="total_parcels_today">Total Parcels Today</string>
+    <string name="assigned_parcels">Assigned Parcels</string>
+    <string name="unassigned_parcels">Unassigned Parcels</string>
+    <string name="active_riders">Active Riders</string>
+    <string name="list_of_riders">List of riders</string>
+    <string name="view_all">View All</string>
+    <string name="rider_name">Rider Name</string>
+    <string name="zone">Zone</string>
+    <string name="orders">Orders</string>
+    <string name="status">Status</string>
+    <string name="scanner_button">Scanner</string>
+
+    <!-- Scanner Screen -->
+    <string name="scan_rider_area">Scan Rider / Area</string>
+    <string name="place_parcel_within_frame">Place the parcel within the frame to scan</string>
+    <string name="upload">Upload</string>
+    <string name="flashlight">Flashlight</string>
+    <string name="click_picture">Click Picture</string>
+
+    <!-- Details Screen -->
+    <string name="details_identified">Details Identified</string>
+    <string name="below_are_riders_available">Below are the riders available for the parcel scanned</string>
+    <string name="riders_available">Riders Available</string>
+    <string name="no_riders_available">No riders available</string>
+    <string name="delivery_address">Delivery Address</string>
+    <string name="area_zone">Area / Zone</string>
+    <string name="assign">Assign</string>
+    <string name="cancel">Cancel</string>
+    <string name="resend">Resend</string>
+    <string name="rider_assigned">Rider Assigned !</string>
+    <string name="next">Next</string>
+
+    <!-- Status -->
+    <string name="online">Online</string>
+    <string name="offline">Offline</string>
+    <string name="available">Available</string>
+
+    <!-- Locations -->
+    <string name="north">North</string>
+    <string name="east">East</string>
+    <string name="west">West</string>
+    <string name="south">South</string>
+    <string name="northeast">Northeast</string>
+
+    <!-- Sample Data -->
+    <string name="sample_rider_name">John</string>
+    <string name="sample_address_line1">123, 5th Avenue</string>
+    <string name="sample_address_line2">Sydney, NSW 2000, Australia</string>
+    <string name="sample_zone_sector">South Zone - Sector 15</string>
+    <string name="patrick_frick">Patrick Frick</string>
+    <string name="mary_james">Mary James</string>
+</resources>

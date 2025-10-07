@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="12dp"
+    android:background="?attr/selectableItemBackground">
+
+    <!-- Rider Name -->
+    <TextView
+        android:id="@+id/tv_rider_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="John"
+        android:textColor="@color/text_primary"
+        android:textSize="14sp"
+        android:gravity="start|center_vertical" />
+
+    <!-- Zone -->
+    <TextView
+        android:id="@+id/tv_zone"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="North"
+        android:textColor="@color/text_primary"
+        android:textSize="14sp"
+        android:gravity="center" />
+
+    <!-- Orders -->
+    <TextView
+        android:id="@+id/tv_orders"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.8"
+        android:text="5"
+        android:textColor="@color/text_primary"
+        android:textSize="14sp"
+        android:gravity="center" />
+
+    <!-- Status -->
+    <TextView
+        android:id="@+id/tv_status"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Online"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        android:background="@drawable/status_background"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="4dp"
+        android:gravity="center" />
+
+</LinearLayout>
