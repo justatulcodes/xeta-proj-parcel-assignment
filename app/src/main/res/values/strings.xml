@@ -38,7 +38,7 @@
     <!-- Status -->
     <string name="online">Online</string>
     <string name="offline">Offline</string>
-    <string name="available">Available</string>
+    <string name="busy">Busy</string>
 
     <!-- Locations -->
     <string name="north">North</string>
@@ -54,4 +54,5 @@
     <string name="sample_zone_sector">South Zone - Sector 15</string>
     <string name="patrick_frick">Patrick Frick</string>
     <string name="mary_james">Mary James</string>
+    <string name="place_the_parcel_within_the_frame_to_scan">Place the parcel within the frame to scan</string>
 </resources>
