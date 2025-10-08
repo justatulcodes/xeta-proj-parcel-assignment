@@ -56,6 +56,9 @@ dependencies {
     implementation("androidx.camera:camera-lifecycle:1.3.1")
     implementation("androidx.camera:camera-view:1.3.1")
 
+    // Image processing
+    implementation("androidx.exifinterface:exifinterface:1.3.7")
+
     // RecyclerView
     implementation("androidx.recyclerview:recyclerview:1.3.2")
 
