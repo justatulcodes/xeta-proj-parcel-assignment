@@ -40,22 +40,18 @@ class RiderAdapter(
             tvZone.text = rider.zone
             tvOrders.text = rider.orders.toString()
 
-            // Set status text and background color
             tvStatus.text = when (rider.status) {
                 RiderStatus.ONLINE -> itemView.context.getString(R.string.online)
                 RiderStatus.OFFLINE -> itemView.context.getString(R.string.offline)
-                RiderStatus.AVAILABLE -> itemView.context.getString(R.string.available)
+                RiderStatus.BUSY -> itemView.context.getString(R.string.busy)
             }
 
-            // Set status background color
             val statusColor = when (rider.status) {
-                RiderStatus.ONLINE -> R.color.status_green
-                RiderStatus.OFFLINE -> R.color.status_red
-                RiderStatus.AVAILABLE -> R.color.status_orange
+                RiderStatus.ONLINE -> R.drawable.status_background_green
+                RiderStatus.OFFLINE -> R.drawable.status_background_red
+                RiderStatus.BUSY -> R.drawable.status_background_oragne
             }
-            tvStatus.setBackgroundColor(
-                ContextCompat.getColor(itemView.context, statusColor)
-            )
+            tvStatus.background = ContextCompat.getDrawable(itemView.context, statusColor)
 
             itemView.setOnClickListener { onItemClick(rider) }
         }

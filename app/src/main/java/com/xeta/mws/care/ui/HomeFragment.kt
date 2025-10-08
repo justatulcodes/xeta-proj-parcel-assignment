@@ -57,7 +57,6 @@ class HomeFragment : Fragment() {
 
     private fun setupClickListeners() {
         fabScanner.setOnClickListener {
-            // Navigate to scanner - for now just show a placeholder
             requireActivity().supportFragmentManager.beginTransaction()
                 .replace(android.R.id.content, ScannerFragment())
                 .addToBackStack(null)
@@ -65,7 +64,6 @@ class HomeFragment : Fragment() {
         }
 
         tvViewAll.setOnClickListener {
-            // Navigate to full riders list - placeholder
         }
     }
 
@@ -74,10 +72,9 @@ class HomeFragment : Fragment() {
             Rider("1", "John", "North", 5, RiderStatus.ONLINE),
             Rider("2", "John", "East", 4, RiderStatus.ONLINE),
             Rider("3", "John", "West", 4, RiderStatus.OFFLINE),
-            Rider("4", "John", "South", 2, RiderStatus.AVAILABLE),
-            Rider("5", "John", "North", 5, RiderStatus.AVAILABLE),
+            Rider("4", "John", "South", 2, RiderStatus.BUSY),
+            Rider("5", "John", "North", 5, RiderStatus.BUSY),
             Rider("6", "John", "East", 2, RiderStatus.OFFLINE),
-            Rider("7", "John", "West", 7, RiderStatus.AVAILABLE)
         )
 
         riderAdapter.submitList(sampleRiders)

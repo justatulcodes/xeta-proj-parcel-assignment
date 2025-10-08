@@ -12,5 +12,5 @@ data class Rider(
 enum class RiderStatus {
     ONLINE,
     OFFLINE,
-    AVAILABLE
+    BUSY
 }
