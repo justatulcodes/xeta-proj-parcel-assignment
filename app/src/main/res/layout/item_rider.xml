@@ -6,7 +6,6 @@
     android:padding="12dp"
     android:background="?attr/selectableItemBackground">
 
-    <!-- Rider Name -->
     <TextView
         android:id="@+id/tv_rider_name"
         android:layout_width="0dp"
@@ -17,7 +16,6 @@
         android:textSize="14sp"
         android:gravity="start|center_vertical" />
 
-    <!-- Zone -->
     <TextView
         android:id="@+id/tv_zone"
         android:layout_width="0dp"
@@ -28,7 +26,6 @@
         android:textSize="14sp"
         android:gravity="center" />
 
-    <!-- Orders -->
     <TextView
         android:id="@+id/tv_orders"
         android:layout_width="0dp"
@@ -39,7 +36,6 @@
         android:textSize="14sp"
         android:gravity="center" />
 
-    <!-- Status -->
     <TextView
         android:id="@+id/tv_status"
         android:layout_width="0dp"
@@ -48,7 +44,7 @@
         android:text="Online"
         android:textColor="@color/white"
         android:textSize="12sp"
-        android:background="@drawable/status_background"
+        android:background="@drawable/status_background_green"
         android:paddingHorizontal="8dp"
         android:paddingVertical="4dp"
         android:gravity="center" />
