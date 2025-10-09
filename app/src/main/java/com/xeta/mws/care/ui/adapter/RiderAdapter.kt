@@ -52,6 +52,7 @@ class RiderAdapter(
                 RiderStatus.BUSY -> R.drawable.status_background_oragne
             }
             tvStatus.background = ContextCompat.getDrawable(itemView.context, statusColor)
+            tvStatus.visibility = View.GONE
 
             itemView.setOnClickListener { onItemClick(rider) }
         }

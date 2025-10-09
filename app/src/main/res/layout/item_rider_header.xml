@@ -6,7 +6,6 @@
     android:padding="12dp"
     android:background="@color/light_blue">
 
-    <!-- Rider Name Header -->
     <TextView
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -17,7 +16,6 @@
         android:textStyle="bold"
         android:gravity="start|center_vertical" />
 
-    <!-- Zone Header -->
     <TextView
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -28,7 +26,6 @@
         android:textStyle="bold"
         android:gravity="center" />
 
-    <!-- Orders Header -->
     <TextView
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -39,11 +36,11 @@
         android:textStyle="bold"
         android:gravity="center" />
 
-    <!-- Status Header -->
     <TextView
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:visibility="gone"
         android:text="@string/status"
         android:textColor="@color/text_primary"
         android:textSize="14sp"
