@@ -7,7 +7,6 @@
     android:background="@color/background_gray"
     android:fitsSystemWindows="true">
 
-    <!-- Header -->
     <LinearLayout
         android:id="@+id/header_layout"
         android:layout_width="match_parent"
@@ -42,6 +41,7 @@
             android:id="@+id/iv_notifications_details"
             android:layout_width="32dp"
             android:layout_height="32dp"
+            android:visibility="gone"
             android:src="@drawable/ic_notifications"
             android:background="@drawable/white_circle_background"
             android:padding="6dp" />
@@ -60,7 +60,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Description Text -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -69,7 +68,6 @@
                 android:textSize="14sp"
                 android:layout_marginBottom="16dp" />
 
-            <!-- Scanned Image Preview -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="300dp"
@@ -77,24 +75,83 @@
                 app:cardElevation="4dp"
                 android:layout_marginBottom="16dp">
 
-                <ImageView
-                    android:id="@+id/iv_scanned_image"
+                <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/sample_prescription"
-                    android:background="@color/card_background" />
+                    android:layout_height="match_parent">
 
-                <!-- Corner frame overlay -->
-                <View
-                    android:layout_width="150dp"
-                    android:layout_height="120dp"
-                    android:layout_gravity="center"
-                    android:background="@drawable/scan_frame_overlay" />
+                    <ImageView
+                        android:id="@+id/iv_scanned_image"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/sample_prescription"
+                        android:background="@color/card_background" />
+
+                    <com.canhub.cropper.CropImageView
+                        android:id="@+id/cropImageView"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:cropBorderCornerLength="24dp"
+                        app:cropBorderCornerOffset="2dp"
+                        app:cropBorderCornerThickness="4dp"
+                        app:cropBorderLineThickness="2dp"
+                        app:cropTouchRadius="24dp"
+                        app:cropCornerRadius="0dp"
+                        app:cropFixAspectRatio="false"
+                        app:cropGuidelines="onTouch"
+                        app:cropAutoZoomEnabled="true"
+                        app:cropMaxZoom="500"
+                        app:cropScaleType="centerInside"
+                        android:visibility="gone"
+                        app:cropInitialCropWindowPaddingRatio="0.1" />
+
+                    <LinearLayout
+                        android:id="@+id/crop_buttons_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom"
+                        android:orientation="horizontal"
+                        android:padding="8dp"
+                        android:background="#80000000"
+                        android:gravity="center"
+                        android:visibility="gone">
+
+                        <Button
+                            android:id="@+id/btn_cancel_crop"
+                            android:layout_width="0dp"
+                            android:layout_height="36dp"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="8dp"
+                            android:text="Cancel"
+                            android:textColor="@color/white"
+                            android:backgroundTint="@color/status_red"
+                            android:textSize="12sp" />
+
+                        <Button
+                            android:id="@+id/btn_crop_confirm"
+                            android:layout_width="0dp"
+                            android:layout_height="36dp"
+                            android:layout_weight="1"
+                            android:text="Crop &amp; Scan"
+                            android:textColor="@color/white"
+                            android:backgroundTint="@color/status_green"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+
+                </FrameLayout>
 
             </androidx.cardview.widget.CardView>
 
-            <!-- Riders Available Section -->
+            <Button
+                android:id="@+id/btn_crop_image"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Crop &amp; Re-scan Image"
+                android:textColor="@color/white"
+                android:backgroundTint="@color/primary_blue"
+                android:layout_marginBottom="16dp" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -104,155 +161,12 @@
                 android:textStyle="bold"
                 android:layout_marginBottom="12dp" />
 
-            <!-- Riders List -->
-            <LinearLayout
-                android:id="@+id/riders_container"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_riders"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginBottom="16dp">
+                android:layout_marginBottom="16dp" />
 
-                <!-- Rider 1 - Patrick Frick -->
-                <androidx.cardview.widget.CardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:cardCornerRadius="8dp"
-                    app:cardElevation="2dp"
-                    android:layout_marginBottom="8dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:padding="16dp"
-                        android:gravity="center_vertical"
-                        android:background="@color/card_background">
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/patrick_frick"
-                                android:textColor="@color/text_primary"
-                                android:textSize="16sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Area : Northeast"
-                                android:textColor="@color/text_secondary"
-                                android:textSize="12sp"
-                                android:layout_marginTop="4dp" />
-
-                        </LinearLayout>
-
-                        <Button
-                            android:id="@+id/btn_assign_patrick"
-                            android:layout_width="wrap_content"
-                            android:layout_height="36dp"
-                            android:text="@string/assign"
-                            android:textColor="@color/white"
-                            android:backgroundTint="@color/status_green"
-                            android:textSize="12sp"
-                            android:includeFontPadding="false"
-                            android:layout_marginEnd="8dp"
-                            android:minWidth="0dp"
-                            android:paddingHorizontal="16dp" />
-
-                        <Button
-                            android:id="@+id/btn_cancel_patrick"
-                            android:layout_width="wrap_content"
-                            android:layout_height="36dp"
-                            android:text="@string/cancel"
-                            android:textColor="@color/white"
-                            android:includeFontPadding="false"
-                            android:backgroundTint="@color/status_red"
-                            android:textSize="12sp"
-                            android:minWidth="0dp"
-                            android:paddingHorizontal="16dp" />
-
-                    </LinearLayout>
-
-                </androidx.cardview.widget.CardView>
-
-                <!-- Rider 2 - Mary James -->
-                <androidx.cardview.widget.CardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:cardCornerRadius="8dp"
-                    app:cardElevation="2dp"
-                    android:layout_marginBottom="8dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:padding="16dp"
-                        android:gravity="center_vertical"
-                        android:background="@color/card_background">
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/mary_james"
-                                android:textColor="@color/text_primary"
-                                android:textSize="16sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Area : Northeast"
-                                android:textColor="@color/text_secondary"
-                                android:textSize="12sp"
-                                android:layout_marginTop="4dp" />
-
-                        </LinearLayout>
-
-                        <Button
-                            android:id="@+id/btn_assign_mary"
-                            android:layout_width="wrap_content"
-                            android:layout_height="36dp"
-                            android:text="@string/assign"
-                            android:textColor="@color/white"
-                            android:backgroundTint="@color/status_green"
-                            android:textSize="12sp"
-                            android:includeFontPadding="false"
-                            android:layout_marginEnd="8dp"
-                            android:minWidth="0dp"
-                            android:paddingHorizontal="16dp" />
-
-                        <Button
-                            android:id="@+id/btn_cancel_mary"
-                            android:layout_width="wrap_content"
-                            android:layout_height="36dp"
-                            android:text="@string/cancel"
-                            android:textColor="@color/white"
-                            android:backgroundTint="@color/status_red"
-                            android:textSize="12sp"
-                            android:includeFontPadding="false"
-                            android:minWidth="0dp"
-                            android:paddingHorizontal="16dp" />
-
-                    </LinearLayout>
-
-                </androidx.cardview.widget.CardView>
-
-            </LinearLayout>
-
-            <!-- Delivery Address Section -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

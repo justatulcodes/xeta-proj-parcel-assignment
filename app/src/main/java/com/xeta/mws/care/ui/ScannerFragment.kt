@@ -173,7 +173,6 @@ class ScannerFragment : Fragment() {
                 isFlashlightOn = !isFlashlightOn
                 camera.cameraControl.enableTorch(isFlashlightOn)
 
-                // Update flashlight icon
                 val iconRes = if (isFlashlightOn) {
                     R.drawable.ic_flashlight_on
                 } else {

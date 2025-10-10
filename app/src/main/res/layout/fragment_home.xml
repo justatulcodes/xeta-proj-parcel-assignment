@@ -22,9 +22,9 @@
 
         <ImageView
             android:layout_width="150dp"
-            android:layout_height="50dp"
+            android:layout_height="42dp"
             android:src="@drawable/logo"
-            android:padding="8dp" />
+            android:padding="5dp" />
 
         <ImageView
             android:id="@+id/iv_profile"

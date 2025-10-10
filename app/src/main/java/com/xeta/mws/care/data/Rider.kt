@@ -14,3 +14,8 @@ enum class RiderStatus {
     OFFLINE,
     BUSY
 }
+
+data class AvailableRider(
+    val name: String,
+    val area: String
+)
