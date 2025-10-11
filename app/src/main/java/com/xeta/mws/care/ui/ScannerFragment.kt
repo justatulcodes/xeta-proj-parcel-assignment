@@ -133,23 +133,9 @@ class ScannerFragment : Fragment() {
                     val savedUri = output.savedUri
                     Log.d(TAG, "Photo capture succeeded: $savedUri")
 
-                    // Navigate to details with the captured image and sample text
                     savedUri?.let { uri ->
                         val sampleText = """
-                            PRESCRIPTIONS
-                            Woodchester Slough Pharmacy
-                            123, 5th Avenue
-                            Sydney, NSW 2000, Australia
-                            Phone: (02) 9876 5432
                             
-                            Patient: John Smith
-                            Address: 123, 5th Avenue, Sydney NSW 2000
-                            
-                            Prescription Details:
-                            - Medicine A: 2 tablets daily
-                            - Medicine B: 1 tablet morning
-                            
-                            Thank You
                         """.trimIndent()
 
                         navigateToDetails(uri.path!!, sampleText)

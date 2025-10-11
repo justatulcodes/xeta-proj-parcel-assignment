@@ -3,7 +3,11 @@ package com.xeta.mws.care.ui
 import android.app.AlertDialog
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Canvas
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
 import android.graphics.Matrix
+import android.graphics.Paint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -84,6 +88,8 @@ class DetailsFragment : Fragment() {
         setupClickListeners()
         setupRidersRecyclerView()
         loadCapturedImage()
+        enterCropMode()
+        setDefaultAddressValues()
         updateAddressFromText()
     }
 
@@ -107,9 +113,9 @@ class DetailsFragment : Fragment() {
         val riders = listOf(
             AvailableRider("Patrick Frick", "Northeast"),
             AvailableRider("Mary James", "Northeast"),
-            AvailableRider("John Smith", "Southwest"),
-            AvailableRider("Sarah Wilson", "Southeast"),
-            AvailableRider("Mike Johnson", "Northwest")
+//            AvailableRider("John Smith", "Southwest"),
+//            AvailableRider("Sarah Wilson", "Southeast"),
+//            AvailableRider("Mike Johnson", "Northwest")
         )
 
         ridersAdapter = RidersAdapter(
@@ -222,16 +228,43 @@ class DetailsFragment : Fragment() {
         val croppedBitmap = cropImageView.getCroppedImage()
 
         if (croppedBitmap != null) {
+
             currentBitmap = croppedBitmap
             ivScannedImage.setImageBitmap(croppedBitmap)
 
-            performTextRecognition(croppedBitmap)
+            val optimizedBitmap = preprocessImageForOCR(croppedBitmap)
+            performTextRecognition(optimizedBitmap)
 
             exitCropMode()
         } else {
             Toast.makeText(requireContext(), "Failed to crop image", Toast.LENGTH_SHORT).show()
         }
     }
+
+    private fun preprocessImageForOCR(bitmap: Bitmap): Bitmap {
+        val width = bitmap.width
+        val height = bitmap.height
+        val processedBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(processedBitmap)
+
+        val paint = Paint().apply {
+            // Increase contrast
+            colorFilter = ColorMatrixColorFilter(ColorMatrix().apply {
+                set(
+                    floatArrayOf(
+                        1.5f, 0f, 0f, 0f, -50f,
+                        0f, 1.5f, 0f, 0f, -50f,
+                        0f, 0f, 1.5f, 0f, -50f,
+                        0f, 0f, 0f, 1f, 0f
+                    )
+                )
+            })
+        }
+
+        canvas.drawBitmap(bitmap, 0f, 0f, paint)
+        return processedBitmap
+    }
+
 
     private fun performTextRecognition(bitmap: Bitmap) {
         val image = InputImage.fromBitmap(bitmap, 0)
@@ -240,43 +273,103 @@ class DetailsFragment : Fragment() {
         recognizer.process(image)
             .addOnSuccessListener { visionText ->
                 extractedText = visionText.text
-                updateAddressFromText()
-                Toast.makeText(requireContext(), "Text extracted successfully", Toast.LENGTH_SHORT).show()
+
+                if (extractedText.isNullOrBlank()) {
+                    Toast.makeText(requireContext(), "No text detected. Please try again.", Toast.LENGTH_SHORT).show()
+                    setDefaultAddressValues()
+                } else {
+                    updateAddressFromText()
+                    Toast.makeText(requireContext(), "Address detected successfully", Toast.LENGTH_SHORT).show()
+                }
             }
             .addOnFailureListener { e ->
                 e.printStackTrace()
-                Toast.makeText(requireContext(), "Failed to extract text", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Failed to extract text: ${e.message}", Toast.LENGTH_SHORT).show()
+                setDefaultAddressValues()
             }
     }
 
+    private fun setDefaultAddressValues() {
+        tvAddressLine1.text = "No address detected"
+        tvAddressLine2.text = "Please scan a valid parcel"
+        tvZoneSector.text = "Zone: Unknown"
+    }
+
+
     private fun updateAddressFromText() {
         extractedText?.let { text ->
-            val lines = text.lines().filter { it.trim().isNotEmpty() }
+            val lines = text.lines()
+                .map { it.trim() }
+                .filter { it.isNotEmpty() && it.length > 2 }
 
-            var addressLine1 = "123, 5th Avenue"
-            var addressLine2 = "Sydney, NSW 2000, Australia"
-            var zoneSector = "South Zone - Sector 15"
+            if (lines.isEmpty()) {
+                setDefaultAddressValues()
+                return
+            }
+
+            var addressLine1 = ""
+            var addressLine2 = ""
+            var zoneSector = ""
+
+            val streetPattern = Regex(""".*\d+.*(?:street|st|avenue|ave|road|rd|drive|dr|lane|ln|boulevard|blvd|way|court|ct).*""", RegexOption.IGNORE_CASE)
+            val postalCodePattern = Regex(""".*\b\d{4,6}\b.*""")
+            val cityStatePattern = Regex(""".*(?:NSW|VIC|QLD|SA|WA|TAS|NT|ACT|Sydney|Melbourne|Brisbane|Perth|Adelaide).*""", RegexOption.IGNORE_CASE)
+            val zonePattern = Regex(""".*(?:zone|sector|area|district).*\d+.*""", RegexOption.IGNORE_CASE)
 
             lines.forEach { line ->
                 when {
-                    line.contains("address", ignoreCase = true) ||
-                            line.contains("street", ignoreCase = true) ||
-                            line.matches(Regex(".*\\d+.*[Aa]venue.*")) -> {
-                        addressLine1 = line.trim()
+                    addressLine1.isEmpty() && streetPattern.matches(line) -> {
+                        addressLine1 = line
                     }
 
-                    line.contains("NSW", ignoreCase = true) ||
-                            line.contains("Sydney", ignoreCase = true) ||
-                            line.contains("Australia", ignoreCase = true) -> {
-                        addressLine2 = line.trim()
+                    addressLine2.isEmpty() && (cityStatePattern.matches(line) || postalCodePattern.matches(line)) -> {
+                        addressLine2 = line
+                    }
+
+                    zoneSector.isEmpty() && zonePattern.matches(line) -> {
+                        zoneSector = line
                     }
                 }
             }
 
-            tvAddressLine1.text = addressLine1
-            tvAddressLine2.text = addressLine2
+            if (addressLine1.isEmpty() && lines.isNotEmpty()) {
+                addressLine1 = lines.firstOrNull { it.any { char -> char.isDigit() } }
+                    ?: lines.firstOrNull()
+                            ?: "Address not detected"
+            }
+
+            if (addressLine2.isEmpty() && lines.size > 1) {
+                addressLine2 = lines.drop(1).firstOrNull {
+                    it.any { char -> char.isLetter() } && it != addressLine1
+                } ?: "City/State not detected"
+            }
+
+            addressLine1 = cleanAddressText(addressLine1)
+            addressLine2 = cleanAddressText(addressLine2)
+            zoneSector = if (zoneSector.isNotEmpty()) cleanAddressText(zoneSector) else "Zone: Not specified"
+
+            tvAddressLine1.text = addressLine1.ifEmpty { "Address not detected" }
+            tvAddressLine2.text = addressLine2.ifEmpty { "City/State not detected" }
             tvZoneSector.text = zoneSector
-        }
+
+            android.util.Log.d("AddressScanner", "Detected - Line1: $addressLine1, Line2: $addressLine2, Zone: $zoneSector")
+        } ?: setDefaultAddressValues()
+    }
+
+    private fun cleanAddressText(text: String): String {
+        return text
+            .replace(Regex("\\s+"), " ") // Replace multiple spaces with single space
+            .replace(Regex("[^a-zA-Z0-9\\s,.-]"), "") // Remove unwanted special chars
+            .trim()
+            .split(" ")
+            .joinToString(" ") { word ->
+                // Proper capitalization (except for small words)
+                if (word.length <= 2 && word.lowercase() !in listOf("st", "rd", "dr", "ln")) {
+                    word.uppercase()
+                } else {
+                    word.lowercase().replaceFirstChar { it.uppercase() }
+                }
+            }
     }
 
     private fun showRiderAssignedDialog(riderName: String) {

@@ -49,9 +49,9 @@
 
     <!-- Sample Data -->
     <string name="sample_rider_name">John</string>
-    <string name="sample_address_line1">123, 5th Avenue</string>
-    <string name="sample_address_line2">Sydney, NSW 2000, Australia</string>
-    <string name="sample_zone_sector">South Zone - Sector 15</string>
+    <string name="sample_address_line1">No address detected</string>
+    <string name="sample_address_line2">Please scan a valid parcel</string>
+    <string name="sample_zone_sector">Zone: Unknown</string>
     <string name="patrick_frick">Patrick Frick</string>
     <string name="mary_james">Mary James</string>
     <string name="place_the_parcel_within_the_frame_to_scan">Place the parcel within the frame to scan</string>
