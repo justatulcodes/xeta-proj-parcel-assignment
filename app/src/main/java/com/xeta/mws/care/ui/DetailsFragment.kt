@@ -42,9 +42,6 @@ class DetailsFragment : Fragment() {
     private lateinit var ridersAdapter: RidersAdapter
     private lateinit var btnResend: Button
     private lateinit var tvAddressLine1: TextView
-    private lateinit var tvAddressLine2: TextView
-    private lateinit var tvZoneSector: TextView
-
     private var imagePath: String? = null
     private var extractedText: String? = null
     private var currentBitmap: Bitmap? = null
@@ -103,8 +100,6 @@ class DetailsFragment : Fragment() {
         cropButtonsLayout = view.findViewById(R.id.crop_buttons_layout)
         btnResend = view.findViewById(R.id.btn_resend)
         tvAddressLine1 = view.findViewById(R.id.tv_address_line1)
-        tvAddressLine2 = view.findViewById(R.id.tv_address_line2)
-        tvZoneSector = view.findViewById(R.id.tv_zone_sector)
         rvRiders = view.findViewById(R.id.rv_riders)
 
     }
@@ -291,8 +286,6 @@ class DetailsFragment : Fragment() {
 
     private fun setDefaultAddressValues() {
         tvAddressLine1.text = "No address detected"
-        tvAddressLine2.text = "Please scan a valid parcel"
-        tvZoneSector.text = "Zone: Unknown"
     }
 
 
@@ -348,9 +341,8 @@ class DetailsFragment : Fragment() {
             addressLine2 = cleanAddressText(addressLine2)
             zoneSector = if (zoneSector.isNotEmpty()) cleanAddressText(zoneSector) else "Zone: Not specified"
 
-            tvAddressLine1.text = addressLine1.ifEmpty { "Address not detected" }
-            tvAddressLine2.text = addressLine2.ifEmpty { "City/State not detected" }
-            tvZoneSector.text = zoneSector
+            val rawDetectedText = lines.joinToString()
+            tvAddressLine1.text = rawDetectedText
 
             android.util.Log.d("AddressScanner", "Detected - Line1: $addressLine1, Line2: $addressLine2, Zone: $zoneSector")
         } ?: setDefaultAddressValues()

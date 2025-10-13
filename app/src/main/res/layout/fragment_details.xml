@@ -214,15 +214,6 @@
                         android:textSize="14sp"
                         android:layout_marginBottom="4dp" />
 
-                    <TextView
-                        android:id="@+id/tv_address_line2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/sample_address_line2"
-                        android:textColor="@color/text_light"
-                        android:textSize="14sp"
-                        android:layout_marginBottom="12dp" />
-
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -244,6 +235,7 @@
                             android:text="@string/sample_zone_sector"
                             android:textColor="@color/text_light"
                             android:textSize="12sp"
+                            android:visibility="gone"
                             android:background="@drawable/zone_background"
                             android:paddingHorizontal="8dp"
                             android:paddingVertical="4dp" />
