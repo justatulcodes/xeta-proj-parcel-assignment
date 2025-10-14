@@ -13,6 +13,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -27,7 +28,21 @@ import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import com.xeta.mws.care.R
 import com.xeta.mws.care.data.AvailableRider
+import com.xeta.mws.care.data.network.AddressCandidate
+import com.xeta.mws.care.data.network.ConfirmAssignmentRequest
+import com.xeta.mws.care.data.network.GenericResponse
+import com.xeta.mws.care.data.network.Metadata
+import com.xeta.mws.care.data.network.OcrAddressRequest
+import com.xeta.mws.care.data.network.OcrAddressResponse
+import com.xeta.mws.care.data.network.RawImageMeta
+import com.xeta.mws.care.data.network.RetrofitClient
 import com.xeta.mws.care.ui.adapter.RidersAdapter
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class DetailsFragment : Fragment() {
 
@@ -42,10 +57,18 @@ class DetailsFragment : Fragment() {
     private lateinit var ridersAdapter: RidersAdapter
     private lateinit var btnResend: Button
     private lateinit var tvAddressLine1: TextView
+    private lateinit var btnEditAddress: LinearLayout
     private var imagePath: String? = null
     private var extractedText: String? = null
     private var currentBitmap: Bitmap? = null
     private var isCropMode = false
+
+    // Toast variable to handle single toast instance
+    private var currentToast: Toast? = null
+
+    // New properties for API handling
+    private var selectedAddressCandidate: AddressCandidate? = null
+    private var isProcessingApiCall = false
 
     companion object {
         private const val ARG_IMAGE_PATH = "image_path"
@@ -101,22 +124,19 @@ class DetailsFragment : Fragment() {
         btnResend = view.findViewById(R.id.btn_resend)
         tvAddressLine1 = view.findViewById(R.id.tv_address_line1)
         rvRiders = view.findViewById(R.id.rv_riders)
-
+        btnEditAddress = view.findViewById(R.id.btn_edit_address)
     }
 
     private fun setupRidersRecyclerView() {
         val riders = listOf(
             AvailableRider("Patrick Frick", "Northeast"),
             AvailableRider("Mary James", "Northeast"),
-//            AvailableRider("John Smith", "Southwest"),
-//            AvailableRider("Sarah Wilson", "Southeast"),
-//            AvailableRider("Mike Johnson", "Northwest")
         )
 
         ridersAdapter = RidersAdapter(
             riders = riders,
             onAssignClick = { rider ->
-                showRiderAssignedDialog(rider.name)
+                confirmRiderAssignment(rider)
             },
             onCancelClick = { rider ->
             }
@@ -126,6 +146,60 @@ class DetailsFragment : Fragment() {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = ridersAdapter
         }
+    }
+
+    private fun confirmRiderAssignment(rider: AvailableRider) {
+        // Check if we have a valid address candidate from the server
+        if (selectedAddressCandidate == null) {
+            Toast.makeText(
+                requireContext(),
+                "Please scan and verify an address first",
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+
+        val candidate = selectedAddressCandidate!!
+        val employeeId = "EMP_${rider.name.replace(" ", "_")}" // Create a simple employee ID
+        val parcelId = "PARCEL_${System.currentTimeMillis()}" // Generate a unique parcel ID
+
+        val request = ConfirmAssignmentRequest(
+            employeeId = employeeId,
+            address = candidate.mapboxFeature.placeName,
+            coordinates = candidate.coordinates,
+            mapboxFeature = candidate.mapboxFeature,
+            parcelId = parcelId,
+            metadata = Metadata(notes = "Assigned to ${rider.name} in ${rider.area} area")
+        )
+
+        Toast.makeText(requireContext(), "Assigning to ${rider.name}...", Toast.LENGTH_SHORT).show()
+
+        RetrofitClient.apiService.confirmAssignment(request)
+            .enqueue(object : Callback<GenericResponse> {
+                override fun onResponse(
+                    call: Call<GenericResponse>,
+                    response: Response<GenericResponse>
+                ) {
+                    if (response.isSuccessful) {
+                        showRiderAssignedDialog(rider.name)
+                    } else {
+                        Toast.makeText(
+                            requireContext(),
+                            "Failed to assign: ${response.code()}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+
+                override fun onFailure(call: Call<GenericResponse>, t: Throwable) {
+                    Toast.makeText(
+                        requireContext(),
+                        "Network error: ${t.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    t.printStackTrace()
+                }
+            })
     }
 
 
@@ -147,6 +221,14 @@ class DetailsFragment : Fragment() {
         }
 
         btnResend.setOnClickListener {
+            extractedText?.let { text ->
+                // Manually trigger the server-side OCR process
+                processAddressWithServer(text)
+            } ?: Toast.makeText(requireContext(), "No text to process", Toast.LENGTH_SHORT).show()
+        }
+
+        btnEditAddress.setOnClickListener {
+            showEditAddressDialog()
         }
     }
 
@@ -337,31 +419,80 @@ class DetailsFragment : Fragment() {
                 } ?: "City/State not detected"
             }
 
-            addressLine1 = cleanAddressText(addressLine1)
-            addressLine2 = cleanAddressText(addressLine2)
-            zoneSector = if (zoneSector.isNotEmpty()) cleanAddressText(zoneSector) else "Zone: Not specified"
+//            addressLine1 = cleanAddressText(addressLine1)
+//            addressLine2 = cleanAddressText(addressLine2)
+//            zoneSector = if (zoneSector.isNotEmpty()) cleanAddressText(zoneSector) else "Zone: Not specified"
 
             val rawDetectedText = lines.joinToString()
             tvAddressLine1.text = rawDetectedText
 
             android.util.Log.d("AddressScanner", "Detected - Line1: $addressLine1, Line2: $addressLine2, Zone: $zoneSector")
+
+            processAddressWithServer(rawDetectedText)
         } ?: setDefaultAddressValues()
     }
 
-    private fun cleanAddressText(text: String): String {
-        return text
-            .replace(Regex("\\s+"), " ") // Replace multiple spaces with single space
-            .replace(Regex("[^a-zA-Z0-9\\s,.-]"), "") // Remove unwanted special chars
-            .trim()
-            .split(" ")
-            .joinToString(" ") { word ->
-                // Proper capitalization (except for small words)
-                if (word.length <= 2 && word.lowercase() !in listOf("st", "rd", "dr", "ln")) {
-                    word.uppercase()
-                } else {
-                    word.lowercase().replaceFirstChar { it.uppercase() }
+    private fun processAddressWithServer(detectedText: String) {
+        if (isProcessingApiCall) return
+        isProcessingApiCall = true
+
+        val timestamp = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US)
+            .format(Date())
+
+        val request = OcrAddressRequest(
+            ocrText = detectedText,
+            rawImageMeta = RawImageMeta(
+                device = android.os.Build.MODEL,
+                timestamp = timestamp
+            )
+        )
+
+        RetrofitClient.apiService.processOcrAddress(request)
+            .enqueue(object : Callback<OcrAddressResponse> {
+                override fun onResponse(call: Call<OcrAddressResponse>, response: Response<OcrAddressResponse>) {
+                    isProcessingApiCall = false
+                    if (response.isSuccessful && response.body() != null) {
+                        val ocrResponse = response.body()!!
+                        handleOcrAddressResponse(ocrResponse)
+                    } else {
+                        Toast.makeText(
+                            requireContext(),
+                            "Error processing address: ${response.code()}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
-            }
+                override fun onFailure(call: Call<OcrAddressResponse>, t: Throwable) {
+                    isProcessingApiCall = false
+                    Toast.makeText(
+                        requireContext(),
+                        "Network error: ${t.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    t.printStackTrace()
+                }
+            })
+    }
+
+    private fun handleOcrAddressResponse(response: OcrAddressResponse) {
+        if (response.candidates.isNotEmpty()) {
+            selectedAddressCandidate = response.candidates.firstOrNull()
+
+            val bestCandidate = response.candidates.first()
+            tvAddressLine1.text = bestCandidate.mapboxFeature.placeName
+
+            Toast.makeText(
+                requireContext(),
+                "Address verified successfully",
+                Toast.LENGTH_SHORT
+            ).show()
+        } else {
+            Toast.makeText(
+                requireContext(),
+                "No address matches found",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 
     private fun showRiderAssignedDialog(riderName: String) {
@@ -386,9 +517,48 @@ class DetailsFragment : Fragment() {
             .commit()
     }
 
+    private fun showToast(message: String) {
+        currentToast?.cancel()
+        currentToast = Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT)
+        currentToast?.show()
+    }
+
+    private fun showEditAddressDialog() {
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_edit_address, null)
+        val etAddress = dialogView.findViewById<EditText>(R.id.et_address)
+        val btnSave = dialogView.findViewById<Button>(R.id.btn_save)
+        val btnCancel = dialogView.findViewById<Button>(R.id.btn_cancel)
+
+        etAddress.setText(tvAddressLine1.text)
+
+        val dialog = AlertDialog.Builder(requireContext())
+            .setTitle("Edit Address")
+            .setView(dialogView)
+            .setCancelable(false)
+            .create()
+
+        btnSave.setOnClickListener {
+            val newAddress = etAddress.text.toString().trim()
+            if (newAddress.isNotEmpty()) {
+                tvAddressLine1.text = newAddress
+                processAddressWithServer(newAddress)
+                dialog.dismiss()
+            } else {
+                showToast("Address cannot be empty")
+            }
+        }
+
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         currentBitmap?.recycle()
         currentBitmap = null
     }
 }
+

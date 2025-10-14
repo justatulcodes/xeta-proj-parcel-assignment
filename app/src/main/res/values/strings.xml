@@ -55,4 +55,5 @@
     <string name="patrick_frick">Patrick Frick</string>
     <string name="mary_james">Mary James</string>
     <string name="place_the_parcel_within_the_frame_to_scan">Place the parcel within the frame to scan</string>
+    <string name="text_color">#2A2A2A</string>
 </resources>

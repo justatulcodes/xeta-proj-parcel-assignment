@@ -168,6 +168,7 @@
                 android:layout_marginBottom="16dp" />
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/cvDeliveryAddress"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:cardCornerRadius="12dp"
@@ -195,13 +196,45 @@
                             app:tint="@color/white" />
 
                         <TextView
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:text="@string/delivery_address"
                             android:textColor="@color/text_light"
                             android:textSize="14sp"
                             android:textStyle="bold"
+                            android:layout_weight="1"
                             android:layout_marginStart="8dp" />
+
+                        <LinearLayout
+                            android:id="@+id/btn_edit_address"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingHorizontal="8dp"
+                            android:clickable="true"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:background="@drawable/white_circle_background"
+                                android:src="@drawable/ic_edit"
+                                app:iconTint="@color/primary_blue"
+                                android:contentDescription="Edit address"
+                                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                                android:padding="8dp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Edit"
+                                android:textColor="@color/text_light"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:layout_weight="1"
+                                android:layout_marginStart="8dp" />
+
+                        </LinearLayout>
+
 
                     </LinearLayout>
 
