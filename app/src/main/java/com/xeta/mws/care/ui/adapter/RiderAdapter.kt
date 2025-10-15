@@ -30,29 +30,15 @@ class RiderAdapter(
         private val itemView: View
     ) : RecyclerView.ViewHolder(itemView) {
 
-        private val tvRiderName: TextView = itemView.findViewById(R.id.tv_rider_name)
-        private val tvZone: TextView = itemView.findViewById(R.id.tv_zone)
-        private val tvOrders: TextView = itemView.findViewById(R.id.tv_orders)
-        private val tvStatus: TextView = itemView.findViewById(R.id.tv_status)
+        private val tvRiderName: TextView = itemView.findViewById(R.id.tv_full_name)
+        private val tvZone: TextView = itemView.findViewById(R.id.tv_designation)
+        private val tvOrders: TextView = itemView.findViewById(R.id.tv_parcels_assigned)
 
         fun bind(rider: Rider, onItemClick: (Rider) -> Unit) {
             tvRiderName.text = rider.name
             tvZone.text = rider.zone
             tvOrders.text = rider.orders.toString()
 
-            tvStatus.text = when (rider.status) {
-                RiderStatus.ONLINE -> itemView.context.getString(R.string.online)
-                RiderStatus.OFFLINE -> itemView.context.getString(R.string.offline)
-                RiderStatus.BUSY -> itemView.context.getString(R.string.busy)
-            }
-
-            val statusColor = when (rider.status) {
-                RiderStatus.ONLINE -> R.drawable.status_background_green
-                RiderStatus.OFFLINE -> R.drawable.status_background_red
-                RiderStatus.BUSY -> R.drawable.status_background_oragne
-            }
-            tvStatus.background = ContextCompat.getDrawable(itemView.context, statusColor)
-            tvStatus.visibility = View.GONE
 
             itemView.setOnClickListener { onItemClick(rider) }
         }

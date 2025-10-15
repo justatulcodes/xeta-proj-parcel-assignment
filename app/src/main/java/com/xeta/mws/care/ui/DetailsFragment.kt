@@ -479,7 +479,7 @@ class DetailsFragment : Fragment() {
             selectedAddressCandidate = response.candidates.firstOrNull()
 
             val bestCandidate = response.candidates.first()
-            tvAddressLine1.text = bestCandidate.mapboxFeature.placeName
+//            tvAddressLine1.text = bestCandidate.mapboxFeature.placeName
 
             Toast.makeText(
                 requireContext(),

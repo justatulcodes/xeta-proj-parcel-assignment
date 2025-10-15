@@ -98,7 +98,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/total_parcels_today"
+                            android:text="Total Parcels"
                             android:textColor="@color/text_primary"
                             android:textSize="12sp"
                             android:layout_marginBottom="8dp" />
@@ -107,7 +107,7 @@
                             android:id="@+id/tv_total_parcels"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="124"
+                            android:text="0"
                             android:textColor="#150E67"
                             android:textSize="36sp"
                             android:textStyle="bold" />
@@ -135,16 +135,16 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/assigned_parcels"
+                            android:text="Total Riders"
                             android:textColor="@color/text_primary"
                             android:textSize="12sp"
                             android:layout_marginBottom="8dp" />
 
                         <TextView
-                            android:id="@+id/tv_assigned_parcels"
+                            android:id="@+id/tv_total_riders"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="95"
+                            android:text="0"
                             android:textColor="#0C4D2D"
                             android:textSize="36sp"
                             android:textStyle="bold" />
@@ -181,17 +181,17 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/unassigned_parcels"
+                            android:text="Avg Parcels / Rider"
                             android:textColor="@color/text_primary"
                             android:textSize="12sp"
                             android:layout_marginBottom="8dp" />
 
                         <TextView
-                            android:id="@+id/tv_unassigned_parcels"
+                            android:id="@+id/tv_avg_parcels_per_rider"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="29"
-                            android:textColor="#C50007"
+                            android:text="0.0"
+                            android:textColor="#150E67"
                             android:textSize="36sp"
                             android:textStyle="bold" />
 
@@ -218,17 +218,17 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/active_riders"
+                            android:text="Total Regions"
                             android:textColor="@color/text_primary"
                             android:textSize="12sp"
                             android:layout_marginBottom="8dp" />
 
                         <TextView
-                            android:id="@+id/tv_active_riders"
+                            android:id="@+id/tv_total_regions"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="14"
-                            android:textColor="#150E67"
+                            android:text="0"
+                            android:textColor="#0C4D2D"
                             android:textSize="36sp"
                             android:textStyle="bold" />
 
