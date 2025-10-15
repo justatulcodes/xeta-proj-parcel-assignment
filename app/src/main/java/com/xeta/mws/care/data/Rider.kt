@@ -16,6 +16,7 @@ enum class RiderStatus {
 }
 
 data class AvailableRider(
+    val employeeId: String,
     val name: String,
     val area: String
 )

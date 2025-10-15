@@ -63,12 +63,11 @@ class DetailsFragment : Fragment() {
     private var currentBitmap: Bitmap? = null
     private var isCropMode = false
 
-    // Toast variable to handle single toast instance
     private var currentToast: Toast? = null
 
-    // New properties for API handling
     private var selectedAddressCandidate: AddressCandidate? = null
     private var isProcessingApiCall = false
+    private var availableRiders: MutableList<AvailableRider> = mutableListOf()
 
     companion object {
         private const val ARG_IMAGE_PATH = "image_path"
@@ -128,13 +127,8 @@ class DetailsFragment : Fragment() {
     }
 
     private fun setupRidersRecyclerView() {
-        val riders = listOf(
-            AvailableRider("Patrick Frick", "Northeast"),
-            AvailableRider("Mary James", "Northeast"),
-        )
-
         ridersAdapter = RidersAdapter(
-            riders = riders,
+            riders = availableRiders,
             onAssignClick = { rider ->
                 confirmRiderAssignment(rider)
             },
@@ -149,7 +143,6 @@ class DetailsFragment : Fragment() {
     }
 
     private fun confirmRiderAssignment(rider: AvailableRider) {
-        // Check if we have a valid address candidate from the server
         if (selectedAddressCandidate == null) {
             Toast.makeText(
                 requireContext(),
@@ -160,11 +153,10 @@ class DetailsFragment : Fragment() {
         }
 
         val candidate = selectedAddressCandidate!!
-        val employeeId = "EMP_${rider.name.replace(" ", "_")}" // Create a simple employee ID
         val parcelId = "PARCEL_${System.currentTimeMillis()}" // Generate a unique parcel ID
 
         val request = ConfirmAssignmentRequest(
-            employeeId = employeeId,
+            employeeId = rider.employeeId,
             address = candidate.mapboxFeature.placeName,
             coordinates = candidate.coordinates,
             mapboxFeature = candidate.mapboxFeature,
@@ -222,7 +214,6 @@ class DetailsFragment : Fragment() {
 
         btnResend.setOnClickListener {
             extractedText?.let { text ->
-                // Manually trigger the server-side OCR process
                 processAddressWithServer(text)
             } ?: Toast.makeText(requireContext(), "No text to process", Toast.LENGTH_SHORT).show()
         }
@@ -478,8 +469,19 @@ class DetailsFragment : Fragment() {
         if (response.candidates.isNotEmpty()) {
             selectedAddressCandidate = response.candidates.firstOrNull()
 
-            val bestCandidate = response.candidates.first()
-//            tvAddressLine1.text = bestCandidate.mapboxFeature.placeName
+            availableRiders.clear()
+            val bestCandidate = response.candidates.forEach { it ->
+                it.candidateEmployees.forEach { employeeId ->
+                    availableRiders.add(
+                        AvailableRider(
+                            employeeId = employeeId,
+                            name = formatEmployeeName(employeeId),
+                            area = extractAreaFromEmployeeId(employeeId)
+                        )
+                    )
+                }
+            }
+            ridersAdapter.notifyDataSetChanged()
 
             Toast.makeText(
                 requireContext(),
@@ -487,12 +489,25 @@ class DetailsFragment : Fragment() {
                 Toast.LENGTH_SHORT
             ).show()
         } else {
+            availableRiders.clear()
+            ridersAdapter.notifyDataSetChanged()
             Toast.makeText(
                 requireContext(),
                 "No address matches found",
                 Toast.LENGTH_SHORT
             ).show()
         }
+    }
+
+    private fun formatEmployeeName(employeeId: String): String {
+        // Convert "mississauga.2" to "Mississauga 2"
+        return employeeId.split(".")
+            .joinToString(" ") { it.capitalize() }
+    }
+
+    private fun extractAreaFromEmployeeId(employeeId: String): String {
+        // Extract area from employee ID (e.g., "mississauga.2" -> "Mississauga")
+        return employeeId.split(".").firstOrNull()?.capitalize() ?: "Unknown"
     }
 
     private fun showRiderAssignedDialog(riderName: String) {
@@ -561,4 +576,3 @@ class DetailsFragment : Fragment() {
         currentBitmap = null
     }
 }
-
